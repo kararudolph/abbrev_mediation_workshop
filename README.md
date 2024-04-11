@@ -13,6 +13,6 @@ The workshop materials are built using RStudio's
 ## Workshop materials
 
 * The public `bookdown` site may be accessed
-  [here](https://code.nimahejazi.org/ser2023_mediation_workshop/).
+  [here](https://kararudolph.github.io/abbrev_mediation_workshop/).
 * The materials may be downloaded in PDF
-  [here](https://code.nimahejazi.org/ser2023_mediation_workshop/causal_mediation.pdf).
+  [here](https://kararudolph.github.io/abbrev_mediation_workshop/causal_mediation.pdf).
