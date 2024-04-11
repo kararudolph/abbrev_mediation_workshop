@@ -10,19 +10,23 @@ name: booklet
 
 jobs:
   bookdown:
-    name: build-bookdown
+    name: build-and-deploy
     runs-on: ubuntu-latest
-
-    env:
-      R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
-      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Set up Quarto
-        uses: quarto-dev/quarto-actions/setup@v2
+      - name: Install R
+        uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: 'release'
+
+       - name: Install pandoc
+        uses: r-lib/actions/setup-pandoc@v2
+
+      - name: Install tinyTeX
+        uses: r-lib/actions/setup-tinytex@v2
 
       - name: Install System Dependencies
         if: runner.os == 'Linux'
@@ -30,61 +34,19 @@ jobs:
           sudo apt update
           sudo apt install -y curl libcurl4-doc libcurl4-openssl-dev \
             libharfbuzz-dev libfribidi-dev libmagick++-dev libpoppler-cpp-dev
-          quarto install tinytex
-
-      - name: Install R
-        uses: r-lib/actions/setup-r@v2
-        with:
-          r-version: 'release'
 
       - name: Install R Dependencies
         uses: r-lib/actions/setup-renv@v2
-
-      - name: Cache bookdown results
-        uses: actions/cache@v3
-        with:
-          path: _bookdown_files
-          key: bookdown-2-${{ hashFiles('**/*Rmd') }}
-          restore-keys: bookdown-2-
 
       - name: Render book HTML
         run: |
           Rscript -e 'bookdown::clean_book(TRUE)'
           Rscript -e 'bookdown::render_book("index.Rmd", "bookdown::gitbook")'
 
-      #- name: Render book PDF
-        #run: |
-          #Rscript -e 'bookdown::render_book("index.Rmd", "bookdown::pdf_document2")'
-
-      - uses: actions/upload-artifact@v3
-        with:
-          name: _book
-          path: _book/
-
-# Need to first create an empty gh-pages branch
-# see https://pkgdown.r-lib.org/reference/deploy_site_github.html
-# and also add secrets for a GH_PAT and EMAIL to the repository
-# gh-action from https://github.com/Cecilapp/GitHub-Pages-deploy
-  checkout-and-deploy:
-    runs-on: ubuntu-latest
-    needs: bookdown
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Download artifact
-        uses: actions/download-artifact@v3
-        with:
-          # Artifact name
-          name: _book                      # optional
-          # Destination path
-          path: _book                      # optional
-
       - name: Deploy to GitHub Pages
         uses: Cecilapp/GitHub-Pages-deploy@v3
         env:
-          # https://github.com/settings/tokens
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           email: ${{ secrets.EMAIL }}      # must be a verified email
           build_dir: _book/                # "_site/" by default
