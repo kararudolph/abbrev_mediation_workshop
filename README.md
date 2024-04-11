@@ -1,4 +1,4 @@
-# SER 2023 Causal Mediation Workshop [![Booklet](https://github.com/nhejazi/ser2023_mediation_workshop/actions/workflows/bookdown.yml/badge.svg)](https://github.com/nhejazi/ser2023_mediation_workshop/actions/workflows/bookdown.yml)
+# 2024 Abbreviated Causal Mediation Workshop [![Booklet](https://github.com/kararudolph/abbrev_mediation_workshop/actions/workflows/bookdown.yml/badge.svg)](https://github.com/kararudolph/abbrev_mediation_workshop/actions/workflows/bookdown.yml)
 
 This is the GitHub repository for the workshop **Modern Causal Mediation
 Analysis**, offered by by [Iván Díaz](https://www.idiaz.xyz/), [Nima
