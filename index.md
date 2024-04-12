@@ -1,11 +1,11 @@
 ---
 knit: "bookdown::render_book"
-title: "Modern Causal Mediation Analysis"
-subtitle: "A Workshop at SER 2023"
+title: "Abbreviated Introduction to (Causal) Mediation Analysis"
+subtitle: "3LC Workshop 2024"
 author: "[Iván Díaz](https://www.idiaz.xyz/),
   [Nima Hejazi](https://nimahejazi.org),
   [Kara Rudolph](https://kararudolph.github.io/)"
-date: "updated: April 11, 2024"
+date: "updated: April 12, 2024"
 documentclass: book
 site: bookdown::bookdown_site
 bibliography: [book.bib, packages.bib]
