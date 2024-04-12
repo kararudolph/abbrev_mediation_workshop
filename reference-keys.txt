@@ -4,7 +4,6 @@ fig:unnamed-chunk-1
 fig:unnamed-chunk-12
 fig:unnamed-chunk-14
 fig:unnamed-chunk-22
-fig:unnamed-chunk-2
 about
 schedule
 instructors
@@ -69,13 +68,6 @@ how-to-compute-the-one-step-estimator-akin-to-augmented-ipw
 performance-of-the-one-step-estimator-in-a-small-simulation-study
 a-note-about-targeted-minimum-loss-based-estimation-tmle
 a-note-about-cross-fitting
-r-packages-for-estimation-of-the-causal-indirect-effects
-medoutcon-natural-and-interventional-indirect-effects
-natural-indirect-effects
-interlude-sl3-for-nuisance-parameter-estimation
-efficient-estimation-of-the-natural-indirect-effects
-interventional-indirect-effects-1
-efficient-estimation-of-the-interventional-indirect-effects
 appendix-additional-topics-of-interest
 mediation-with-multiple-mediators-and-multiple-intermediate-confounders
 mediation-with-time-varying-treatments-mediators-and-covariates
