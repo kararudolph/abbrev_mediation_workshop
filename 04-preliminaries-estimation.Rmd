@@ -1,4 +1,4 @@
-# Estimation preliminaries: review of doubly robust estimators for the average treatment effect
+# Estimation preliminaries: review of estimators for the average treatment effect
 
 Recall our motivation for doing mediation analysis. We would like to decompose
 the total effect of a treatment $A$ on an outcome $Y$ into effects that operate
@@ -24,7 +24,7 @@ A\mid W$), we have
 \[ \E(Y_1) = \E[ \E(Y \mid A=1, W) ]\]
 
 
-## Option 1: G-computation estimator
+## Option 1: Plug-in estimator
 
 The first estimator of $\E[ \E(Y \mid A=1, W)]$ can be obtained in a
 three step procedure:
@@ -66,6 +66,9 @@ $$\frac{1}{n} \sum_{i=1}^n \frac{A_i}{\hat{\P}(A_i=1 \mid W_i)} Y_i$$
 
 ## Option 3: Augmented inverse probability weighted estimator
 
+Not discussed here due to time constraints. 
+
+<!-- 
 Fortunately, we can combine these two estimators to get an estimator with
 improved properties.
 
@@ -100,3 +103,4 @@ This estimator has some desirable properties:
 
 Next, we will work towards constructing estimators with these same properties
 for the mediation parameters that we have introduced.
+-->
