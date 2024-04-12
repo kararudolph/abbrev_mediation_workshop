@@ -19,7 +19,6 @@ rmd_files: [
   "03-how-to-choose.Rmd",
   "04-preliminaries-estimation.Rmd",
   "05-estimation-natural-interventional.Rmd",
-  "06-estimation-code-walkthrough.Rmd",
   "07-appx-additional-readings.Rmd",
   "08-appx-stochastic-effects.Rmd",
   "references.Rmd"
