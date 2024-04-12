@@ -48,8 +48,8 @@ estimand-summary
 estimandirl
 comparative-effectiveness-of-two-medications-for-opioid-use-disorder-oud
 getting-specific-about-the-question
-estimation-preliminaries-review-of-doubly-robust-estimators-for-the-average-treatment-effect
-option-1-g-computation-estimator
+estimation-preliminaries-review-of-estimators-for-the-average-treatment-effect
+option-1-plug-in-estimator
 option-2-inverse-probability-weighted-estimator
 option-3-augmented-inverse-probability-weighted-estimator
 construction-of-g-computation-and-weighted-estimators-for-the-nde-the-case-of-the-natural-direct-effect
