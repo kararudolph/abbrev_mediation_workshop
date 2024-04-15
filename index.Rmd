@@ -61,25 +61,44 @@ parameter estimable from the observed data distribution). Familiarity with the
 
 ## Tentative schedule {#schedule}
 
-* 08:30A-08:45A: Introductions + mediation set-up
+* 09:00A-09:15A: Introductions + mediation set-up
   <!-- Kara, 15 min-->
-* 08:45A-9:15A: Controlled direct effects, natural direct/indirect effects,
+* 09:15A-09:45A: Controlled direct effects, natural direct/indirect effects,
   interventional direct/indirect effects
   <!-- Kara, 30-->
-* 9:15A-9:25A: Choosing an estimand in real-world examples
+* 09:45A-09:55A: Choosing an estimand in real-world examples
   <!-- Kara, 10-->
-* 9:25A-10:00A: What is the EIF?!
-  <!-- Ivan, 35-->
-* 10:00A-10:30A: Break + discussion
-* 10:30A-11:05A: Using the EIF to estimate the natural direct effect
-  <!-- Ivan, 35-->
-* 11:05A-12:00P: Example walkthrough of `R` packages for effect estimation
-  <!-- Nima, 55-->
-* 12:00A-12:30P: Wrap-up
+* 09:55A-10:25A: Break + discussion
+* 10:25A-11:00A: Estimation
+  <!-- Caleb, 35-->
+* 11:00A-11:30A: Example walkthrough of `R` packages for effect estimation
+  <!-- Caleb, 30-->
 
-__NOTE: All times listed in Pacific Time.__
+
+__NOTE: All times listed in Eastern Time.__
 
 ## About the instructors {#instructors}
+
+### [Kara Rudolph](https://kararudolph.github.io/) {-}
+
+I am an Assistant Professor of Epidemiology in the [Mailman School of Public
+Health at Columbia
+University](https://www.publichealth.columbia.edu/academics/departments/epidemiology).
+My research interests are in developing and applying causal inference methods to
+understand social and contextual influences on mental health, substance use, and
+violence in disadvantaged, urban areas of the United States. My current work
+focuses on developing methods for transportability and mediation, and
+subsequently applying those methods to understand how aspects of the school and
+peer environments mediate relationships between neighborhood factors and
+adolescent drug use across populations. More generally, my work on
+generalizing/transporting findings from study samples to target populations and
+identifying subpopulations most likely to benefit from interventions contributes
+to efforts to optimally target available policy and program resources.
+
+### [Caleb Miles](https://calebhmiles.github.io/) {-}
+
+I am an assistant professor in the Department of Biostatistics at the Columbia University Mailman School of Public Health. I work on developing semiparametric methods for causal inference and applying them to problems in medicine and public health. My applied work is largely in HIV/AIDS, mental health, anesthesiology, and urology. My current methodological research interests include causal inference, its intersection with machine learning, mediation analysis, interference, and measurement error.
+
 
 ### [Iván Díaz](https://www.idiaz.xyz/) {-}
 
@@ -112,21 +131,7 @@ passionate about statistical computing and programming, and the design of open
 source software tools for reproducible statistical data science.
 
 
-### [Kara Rudolph](https://kararudolph.github.io/) {-}
 
-I am an Assistant Professor of Epidemiology in the [Mailman School of Public
-Health at Columbia
-University](https://www.publichealth.columbia.edu/academics/departments/epidemiology).
-My research interests are in developing and applying causal inference methods to
-understand social and contextual influences on mental health, substance use, and
-violence in disadvantaged, urban areas of the United States. My current work
-focuses on developing methods for transportability and mediation, and
-subsequently applying those methods to understand how aspects of the school and
-peer environments mediate relationships between neighborhood factors and
-adolescent drug use across populations. More generally, my work on
-generalizing/transporting findings from study samples to target populations and
-identifying subpopulations most likely to benefit from interventions contributes
-to efforts to optimally target available policy and program resources.
 
 ## Reproducibility {#repro}
 
