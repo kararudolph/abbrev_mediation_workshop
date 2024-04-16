@@ -5,7 +5,7 @@ subtitle: "3LC Workshop 2024"
 author: "[Iván Díaz](https://www.idiaz.xyz/),
   [Nima Hejazi](https://nimahejazi.org),
   [Kara Rudolph](https://kararudolph.github.io/)"
-date: "updated: April 15, 2024"
+date: "updated: April 16, 2024"
 documentclass: book
 site: bookdown::bookdown_site
 bibliography: [book.bib, packages.bib]

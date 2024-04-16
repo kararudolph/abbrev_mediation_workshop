@@ -4,18 +4,18 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Abbreviated Introduction to (Causal) Mediation Analysis</title>
+  <title>Chapter 7 R packages for estimation of the causal (in)direct effects | Abbreviated Introduction to (Causal) Mediation Analysis</title>
   <meta name="description" content="Open source, reproducible teaching materials accompanying half or full-day conference workshops on causal mediation analysis." />
   <meta name="generator" content="bookdown 0.26.3 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Abbreviated Introduction to (Causal) Mediation Analysis" />
+  <meta property="og:title" content="Chapter 7 R packages for estimation of the causal (in)direct effects | Abbreviated Introduction to (Causal) Mediation Analysis" />
   <meta property="og:type" content="book" />
   
   <meta property="og:description" content="Open source, reproducible teaching materials accompanying half or full-day conference workshops on causal mediation analysis." />
   <meta name="github-repo" content="nhejazi/causal_mediation_workshops" />
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Abbreviated Introduction to (Causal) Mediation Analysis" />
+  <meta name="twitter:title" content="Chapter 7 R packages for estimation of the causal (in)direct effects | Abbreviated Introduction to (Causal) Mediation Analysis" />
   
   <meta name="twitter:description" content="Open source, reproducible teaching materials accompanying half or full-day conference workshops on causal mediation analysis." />
   
@@ -29,8 +29,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-
-<link rel="next" href="mediation.html"/>
+<link rel="prev" href="construction-of-a-semiparametric-efficient-estimator-for-the-nde-a.k.a.-the-one-step-estimator.html"/>
+<link rel="next" href="appendix-additional-topics-of-interest.html"/>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -1155,385 +1155,450 @@ div.csl-indent {
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="header">
-<h1 class="title">Abbreviated Introduction to (Causal) Mediation Analysis</h1>
-<h2 class="subtitle"><em>3LC Workshop 2024</em></h2>
-<p class="author"><em><a href="https://www.idiaz.xyz/">Iván Díaz</a>, <a href="https://nimahejazi.org">Nima Hejazi</a>, <a href="https://kararudolph.github.io/">Kara Rudolph</a></em></p>
-<p class="date"><em>updated: April 16, 2024</em></p>
+<div id="r-packages-for-estimation-of-the-causal-indirect-effects" class="section level1 hasAnchor" number="7">
+<h1><span class="header-section-number">Chapter 7</span> <code>R</code> packages for estimation of the causal (in)direct effects<a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#r-packages-for-estimation-of-the-causal-indirect-effects" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<p>We’ll now turn to working through a few examples of estimating natural and
+interventional direct and indirect effects. Note that we will be using the <a href="https://github.com/nhejazi/medoutcon">medoutcon R package</a>, but if your data scenario includes <em>multiple</em> mediators and <em>multiple</em> intermediate confounders, you should use the <a href="https://github.com/nt-williams/HDmediation">HDmediation R package</a>.</p>
+<p>As our running
+example, we’ll a simple data set from an observational study of the relationship
+between BMI and kids’ behavior, freely distributed with the <a href="https://CRAN.R-project.org/package=mma"><code>mma</code> <code>R</code> package
+on CRAN</a>. First, let’s load the packages
+we’ll be using and set a seed; then, load this data set and take a quick look.</p>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb35-1" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb35-2"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb35-2" tabindex="-1"></a><span class="fu">library</span>(sl3)</span>
+<span id="cb35-3"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb35-3" tabindex="-1"></a><span class="fu">library</span>(medoutcon)</span>
+<span id="cb35-4"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb35-4" tabindex="-1"></a><span class="fu">library</span>(medshift)</span>
+<span id="cb35-5"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb35-5" tabindex="-1"></a><span class="fu">library</span>(mma)</span>
+<span id="cb35-6"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb35-6" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">429153</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb36-1" tabindex="-1"></a><span class="co"># load and examine data</span></span>
+<span id="cb36-2"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb36-2" tabindex="-1"></a><span class="fu">data</span>(weight_behavior)</span>
+<span id="cb36-3"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb36-3" tabindex="-1"></a><span class="fu">dim</span>(weight_behavior)</span>
+<span id="cb36-4"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb36-4" tabindex="-1"></a><span class="co">#&gt; [1] 691  15</span></span>
+<span id="cb36-5"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb36-5" tabindex="-1"></a></span>
+<span id="cb36-6"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb36-6" tabindex="-1"></a><span class="co"># drop missing values</span></span>
+<span id="cb36-7"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb36-7" tabindex="-1"></a>weight_behavior <span class="ot">&lt;-</span> weight_behavior <span class="sc">%&gt;%</span></span>
+<span id="cb36-8"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb36-8" tabindex="-1"></a>  <span class="fu">drop_na</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb36-9"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb36-9" tabindex="-1"></a>  <span class="fu">as_tibble</span>()</span>
+<span id="cb36-10"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb36-10" tabindex="-1"></a>weight_behavior</span>
+<span id="cb36-11"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb36-11" tabindex="-1"></a><span class="co">#&gt; # A tibble: 567 × 15</span></span>
+<span id="cb36-12"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb36-12" tabindex="-1"></a><span class="co">#&gt;     bmi   age sex   race  numpeople   car gotosch snack tvhours cmpthours</span></span>
+<span id="cb36-13"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb36-13" tabindex="-1"></a><span class="co">#&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;fct&gt; &lt;fct&gt;     &lt;int&gt; &lt;int&gt; &lt;fct&gt;   &lt;fct&gt;   &lt;dbl&gt;     &lt;dbl&gt;</span></span>
+<span id="cb36-14"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb36-14" tabindex="-1"></a><span class="co">#&gt; 1  18.2  12.2 F     OTHER         5     3 2       1           4         0</span></span>
+<span id="cb36-15"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb36-15" tabindex="-1"></a><span class="co">#&gt; 2  22.8  12.8 M     OTHER         4     3 2       1           4         2</span></span>
+<span id="cb36-16"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb36-16" tabindex="-1"></a><span class="co">#&gt; 3  25.6  12.1 M     OTHER         2     3 2       1           0         2</span></span>
+<span id="cb36-17"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb36-17" tabindex="-1"></a><span class="co">#&gt; 4  15.1  12.3 M     OTHER         4     1 2       1           2         1</span></span>
+<span id="cb36-18"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb36-18" tabindex="-1"></a><span class="co">#&gt; 5  23.0  11.8 M     OTHER         4     1 1       1           4         3</span></span>
+<span id="cb36-19"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb36-19" tabindex="-1"></a><span class="co">#&gt; # … with 562 more rows, and 5 more variables: cellhours &lt;dbl&gt;, sports &lt;fct&gt;,</span></span>
+<span id="cb36-20"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb36-20" tabindex="-1"></a><span class="co">#&gt; #   exercises &lt;int&gt;, sweat &lt;int&gt;, overweigh &lt;dbl&gt;</span></span></code></pre></div>
+<p>The documentation for the data set describes it as a “database obtained from the
+Louisiana State University Health Sciences Center, New Orleans, by Dr. Richard
+Scribner. He explored the relationship between BMI and kids’ behavior through a
+survey at children, teachers and parents in Grenada in 2014. This data set
+includes 691 observations and 15 variables.” Note that the data set contained
+several observations with missing values, which we removed above to simplify the
+demonstration of our analytic methods. In practice, we recommend instead using
+appropriate corrections (e.g., imputation, inverse weighting) to fully take
+advantage of the observed data.</p>
+<p>Following the motivation of the original study, we focus on the causal effects
+of participating in a sports team (<code>sports</code>) on the BMI of children (<code>bmi</code>),
+taking into consideration several mediators (<code>snack</code>, <code>exercises</code>, <code>overweigh</code>);
+all other measured covariates are taken to be potential baseline confounders.</p>
+<div id="medoutcon-natural-and-interventional-indirect-effects" class="section level2 hasAnchor" number="7.1">
+<h2><span class="header-section-number">7.1</span> <code>medoutcon</code>: Natural and interventional (in)direct effects<a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#medoutcon-natural-and-interventional-indirect-effects" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>The data on a single observational unit can be represented <span class="math inline">\(O = (W, A, M, Y)\)</span>,
+with the data pooled across all participants denoted <span class="math inline">\(O_1, \ldots, O_n\)</span>, for a
+of <span class="math inline">\(n\)</span> i.i.d. observations of <span class="math inline">\(O\)</span>. Recall the DAG <a href="estimands.html#estimands">from an earlier
+chapter</a>, which represents the data-generating process:</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:unnamed-chunk-1"></span>
+<img src="06-estimation-code-walkthrough_files/figure-html/unnamed-chunk-1-1.png" alt="Directed acyclic graph under *no intermediate confounders* of the mediator-outcome relation affected by treatment" width="80%" />
+<p class="caption">
+FIGURE 2.1: Directed acyclic graph under <em>no intermediate confounders</em> of the mediator-outcome relation affected by treatment
+</p>
 </div>
-<div id="welcome" class="section level1 unnumbered hasAnchor">
-<h1>Welcome!<a href="index.html#welcome" class="anchor-section" aria-label="Anchor link to header"></a></h1>
-<p>This open source, reproducible vignette accompanies a half-day workshop on
-modern methods for <em>causal mediation analysis</em>. While we encourage use of this
-<code>bookdown</code> site, for convenience, we have also made these workshop materials
-<a href="https://code.nimahejazi.org/ser2023_mediation_workshop/causal_mediation.pdf">available in
-PDF</a>.</p>
-<div id="about" class="section level2 hasAnchor" number="0.1">
-<h2><span class="header-section-number">0.1</span> About this workshop<a href="index.html#about" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>Causal mediation analysis can provide a mechanistic understanding of how an
-exposure impacts an outcome, a central goal in epidemiology and health sciences.
-However, rapid methodologic developments coupled with few formal courses
-presents challenges to implementation. Beginning with an overview of classical
-direct and indirect effects, this workshop will present recent advances that
-overcome limitations of previous methods, allowing for: (i) continuous
-exposures, (ii) multiple, non-independent mediators, and (iii) effects
-identifiable in the presence of intermediate confounders affected by exposure.
-Emphasis will be placed on flexible, stochastic and interventional direct and
-indirect effects, highlighting how these may be applied to answer substantive
-epidemiological questions from real-world studies. Multiply robust,
-nonparametric estimators of these causal effects, and free and open source <code>R</code>
-packages (<a href="https://github.com/nhejazi/medshift"><code>medshift</code></a> and
-<a href="https://github.com/nhejazi/medoutcon"><code>medoutcon</code></a>) for their application, will
-be introduced.</p>
-<p>To ensure translation to real-world data analysis, this workshop will
-incorporate hands-on <code>R</code> programming exercises to allow participants practice in
-implementing the statistical tools presented. It is recommended that
-participants have working knowledge of the basic notions of causal inference,
-including counterfactuals and identification (linking the causal effect to a
-parameter estimable from the observed data distribution). Familiarity with the
-<code>R</code> programming language is also recommended.</p>
-</div>
-<div id="schedule" class="section level2 hasAnchor" number="0.2">
-<h2><span class="header-section-number">0.2</span> Tentative schedule<a href="index.html#schedule" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="natural-indirect-effects" class="section level3 hasAnchor" number="7.1.1">
+<h3><span class="header-section-number">7.1.1</span> Natural (in)direct effects<a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#natural-indirect-effects" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>To start, we will consider estimation of the <em>natural</em> direct and indirect effects,
+which, we recall, are defined as follows
+<span class="math display">\[\begin{equation*}
+  \E[Y_{1,M_1} - Y_{0,M_0}] = \underbrace{\E[Y_{\color{red}{1},\color{blue}{M_1}} -
+    Y_{\color{red}{1},\color{blue}{M_0}}]}_{\text{natural indirect effect}} +
+    \underbrace{\E[Y_{\color{blue}{1},\color{red}{M_0}} -
+    Y_{\color{blue}{0},\color{red}{M_0}}]}_{\text{natural direct effect}}.
+\end{equation*}\]</span></p>
 <ul>
-<li>09:00A-09:15A: Introductions + mediation set-up
-<!-- Kara, 15 min--></li>
-<li>09:15A-09:45A: Controlled direct effects, natural direct/indirect effects,
-interventional direct/indirect effects
-<!-- Kara, 30--></li>
-<li>09:45A-09:55A: Choosing an estimand in real-world examples
-<!-- Kara, 10--></li>
-<li>09:55A-10:25A: Break + discussion</li>
-<li>10:25A-11:00A: Estimation
-<!-- Caleb, 35--></li>
-<li>11:00A-11:30A: Example walkthrough of <code>R</code> packages for effect estimation
-<!-- Caleb, 30--></li>
-</ul>
-<p><strong>NOTE: All times listed in Eastern Time.</strong></p>
-</div>
-<div id="instructors" class="section level2 hasAnchor" number="0.3">
-<h2><span class="header-section-number">0.3</span> About the instructors<a href="index.html#instructors" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<div id="kara-rudolph" class="section level3 unnumbered hasAnchor">
-<h3><a href="https://kararudolph.github.io/">Kara Rudolph</a><a href="index.html#kara-rudolph" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>I am an Assistant Professor of Epidemiology in the <a href="https://www.publichealth.columbia.edu/academics/departments/epidemiology">Mailman School of Public
-Health at Columbia
-University</a>.
-My research interests are in developing and applying causal inference methods to
-understand social and contextual influences on mental health, substance use, and
-violence in disadvantaged, urban areas of the United States. My current work
-focuses on developing methods for transportability and mediation, and
-subsequently applying those methods to understand how aspects of the school and
-peer environments mediate relationships between neighborhood factors and
-adolescent drug use across populations. More generally, my work on
-generalizing/transporting findings from study samples to target populations and
-identifying subpopulations most likely to benefit from interventions contributes
-to efforts to optimally target available policy and program resources.</p>
-</div>
-<div id="caleb-miles" class="section level3 unnumbered hasAnchor">
-<h3><a href="https://calebhmiles.github.io/">Caleb Miles</a><a href="index.html#caleb-miles" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>I am an assistant professor in the Department of Biostatistics at the Columbia University Mailman School of Public Health. I work on developing semiparametric methods for causal inference and applying them to problems in medicine and public health. My applied work is largely in HIV/AIDS, mental health, anesthesiology, and urology. My current methodological research interests include causal inference, its intersection with machine learning, mediation analysis, interference, and measurement error.</p>
-</div>
-<div id="iván-díaz" class="section level3 unnumbered hasAnchor">
-<h3><a href="https://www.idiaz.xyz/">Iván Díaz</a><a href="index.html#iván-díaz" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>I am an Associate Professor of Biostatistics in the <a href="https://med.nyu.edu/faculty/ivan-l-diaz">Department of Population
-Health at the New York University Grossman School of
-Medicine</a>. My research focuses on the
-development of non-parametric statistical methods for causal inference from
-observational and randomized studies with complex datasets, using machine
-learning. This includes but is not limited to mediation analysis, methods for
-continuous exposures, longitudinal data including survival analysis, and
-efficiency guarantees with covariate adjustment in randomized trials. I am also
-interested in general semi-parametric theory, machine learning, and
-high-dimensional data.</p>
-</div>
-<div id="nima-hejazi" class="section level3 unnumbered hasAnchor">
-<h3><a href="https://nimahejazi.org">Nima Hejazi</a><a href="index.html#nima-hejazi" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>I am an Assistant Professor of Biostatistics at the <a href="https://connects.catalyst.harvard.edu/Profiles/display/Person/207609">Harvard T.H. Chan School of
-Public
-Health</a>.
-My research interests blend causal inference, machine learning,
-non/semi-parametric inference, and computational statistics, with areas of
-recent emphasis having included causal mediation analysis, efficient estimation
-under outcome-dependent sampling designs, estimation of the causal effects of
-continuous treatments, and machine learning-based sieve estimation in causal
-inference. My methodological work is motivated principally by scientific
-collaborations in clinical trials and observational studies of infectious
-diseases, infectious disease epidemiology, and computational biology. I am also
-passionate about statistical computing and programming, and the design of open
-source software tools for reproducible statistical data science.</p>
-</div>
-</div>
-<div id="repro" class="section level2 hasAnchor" number="0.4">
-<h2><span class="header-section-number">0.4</span> Reproducibility<a href="index.html#repro" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>These workshop materials were written using <a href="http://bookdown.org/">bookdown</a>,
-and the complete source is available on
-<a href="https://github.com/nhejazi/causal_mediation_workshops">GitHub</a>. This version of
-the book was built with R version 4.3.3 (2024-02-29), <a href="https://pandoc.org/">pandoc</a>
-version 3.1.11, and the following packages:</p>
-<table>
-<colgroup>
-<col width="12%" />
-<col width="12%" />
-<col width="75%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th align="left">package</th>
-<th align="left">version</th>
-<th align="left">source</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">bookdown</td>
-<td align="left">0.26.3</td>
-<td align="left">Github (rstudio/bookdown@169c43b6bb95213f2af63a95acd4e977a58a3e1f)</td>
-</tr>
-<tr class="even">
-<td align="left">bslib</td>
-<td align="left">0.3.1.9000</td>
-<td align="left">Github (rstudio/bslib@a4946a49499438e71dce29c810a41e2d05170376)</td>
-</tr>
-<tr class="odd">
-<td align="left">data.table</td>
-<td align="left">1.14.2</td>
-<td align="left">CRAN (R 4.3.3)</td>
-</tr>
-<tr class="even">
-<td align="left">downlit</td>
-<td align="left">0.4.0</td>
-<td align="left">CRAN (R 4.3.3)</td>
-</tr>
-<tr class="odd">
-<td align="left">dplyr</td>
-<td align="left">1.0.9</td>
-<td align="left">CRAN (R 4.3.3)</td>
-</tr>
-<tr class="even">
-<td align="left">ggfortify</td>
-<td align="left">0.4.14</td>
-<td align="left">CRAN (R 4.3.3)</td>
-</tr>
-<tr class="odd">
-<td align="left">ggplot2</td>
-<td align="left">3.3.6</td>
-<td align="left">CRAN (R 4.3.3)</td>
-</tr>
-<tr class="even">
-<td align="left">kableExtra</td>
-<td align="left">1.3.4</td>
-<td align="left">CRAN (R 4.3.3)</td>
-</tr>
-<tr class="odd">
-<td align="left">knitr</td>
-<td align="left">1.39</td>
-<td align="left">CRAN (R 4.3.3)</td>
-</tr>
-<tr class="even">
-<td align="left">magick</td>
-<td align="left">2.7.3</td>
-<td align="left">CRAN (R 4.3.3)</td>
-</tr>
-<tr class="odd">
-<td align="left">medoutcon</td>
-<td align="left">0.1.6</td>
-<td align="left">Github (nhejazi/medoutcon@49af7b52ad7fc5064e6af984a682118d3463917a)</td>
-</tr>
-<tr class="even">
-<td align="left">medshift</td>
-<td align="left">0.1.4</td>
-<td align="left">Github (nhejazi/medshift@0ae0572fc5e37a8595b798909057afbc48304236)</td>
-</tr>
-<tr class="odd">
-<td align="left">mvtnorm</td>
-<td align="left">1.1-3</td>
-<td align="left">CRAN (R 4.3.3)</td>
-</tr>
-<tr class="even">
-<td align="left">origami</td>
-<td align="left">1.0.5</td>
-<td align="left">Github (tlverse/origami@e1b8fe6f5e75fff1d48eed115bb81475c9bd506e)</td>
-</tr>
-<tr class="odd">
-<td align="left">pdftools</td>
-<td align="left">3.2.0</td>
-<td align="left">CRAN (R 4.3.3)</td>
-</tr>
-<tr class="even">
-<td align="left">readr</td>
-<td align="left">2.1.2</td>
-<td align="left">CRAN (R 4.3.3)</td>
-</tr>
-<tr class="odd">
-<td align="left">rmarkdown</td>
-<td align="left">2.14</td>
-<td align="left">CRAN (R 4.3.3)</td>
-</tr>
-<tr class="even">
-<td align="left">skimr</td>
-<td align="left">2.1.4</td>
-<td align="left">CRAN (R 4.3.3)</td>
-</tr>
-<tr class="odd">
-<td align="left">sl3</td>
-<td align="left">1.4.5</td>
-<td align="left">Github (tlverse/sl3@825019f28a650936e24cca421dd155641c860435)</td>
-</tr>
-<tr class="even">
-<td align="left">stringr</td>
-<td align="left">1.4.0</td>
-<td align="left">CRAN (R 4.3.3)</td>
-</tr>
-<tr class="odd">
-<td align="left">tibble</td>
-<td align="left">3.1.7</td>
-<td align="left">CRAN (R 4.3.3)</td>
-</tr>
-<tr class="even">
-<td align="left">tidyr</td>
-<td align="left">1.2.0</td>
-<td align="left">CRAN (R 4.3.3)</td>
-</tr>
-</tbody>
-</table>
-</div>
-<div id="setup" class="section level2 hasAnchor" number="0.5">
-<h2><span class="header-section-number">0.5</span> Setup instructions<a href="index.html#setup" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<div id="r-and-rstudio" class="section level3 hasAnchor" number="0.5.1">
-<h3><span class="header-section-number">0.5.1</span> R and RStudio<a href="index.html#r-and-rstudio" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p><strong>R</strong> and <strong>RStudio</strong> are separate downloads and installations. R is the
-underlying statistical computing environment. RStudio is a graphical integrated
-development environment (IDE) that makes using R much easier and more
-interactive. You need to install R before you install RStudio.</p>
-<div id="windows" class="section level4 hasAnchor" number="0.5.1.1">
-<h4><span class="header-section-number">0.5.1.1</span> Windows<a href="index.html#windows" class="anchor-section" aria-label="Anchor link to header"></a></h4>
-<div id="if-you-already-have-r-and-rstudio-installed" class="section level5 hasAnchor" number="0.5.1.1.1">
-<h5><span class="header-section-number">0.5.1.1.1</span> If you already have R and RStudio installed<a href="index.html#if-you-already-have-r-and-rstudio-installed" class="anchor-section" aria-label="Anchor link to header"></a></h5>
-<ul>
-<li>Open RStudio, and click on “Help” &gt; “Check for updates”. If a new version is
-available, quit RStudio, and download the latest version for RStudio.</li>
-<li>To check which version of R you are using, start RStudio and the first thing
-that appears in the console indicates the version of R you are
-running. Alternatively, you can type <code>sessionInfo()</code>, which will also display
-which version of R you are running. Go on the <a href="https://cran.r-project.org/bin/windows/base/">CRAN
-website</a> and check whether a
-more recent version is available. If so, please download and install it. You
-can <a href="https://cran.r-project.org/bin/windows/base/rw-FAQ.html#How-do-I-UNinstall-R_003f">check here</a>
-for more information on how to remove old versions from your system if you
-wish to do so.</li>
+<li>Our <a href="https://github.com/nhejazi/medoutcon"><code>medoutcon</code> <code>R</code> package</a>
+<span class="citation">(<a href="#ref-hejazi2022medoutcon-rpkg">Hejazi, Dı́az and Rudolph, 2022a</a>; <a href="#ref-hejazi2022medoutcon-joss">Hejazi, Rudolph and Dı́az, 2022b</a>)</span>, which accompanies
+<span class="citation">Dı́az et al. (<a href="#ref-diaz2020nonparametric">2020</a>)</span>, implements one-step and TML estimators of both the
+natural and interventional (in)direct effects.</li>
+<li>Both types of estimators are capable of accommodating flexible modeling
+strategies (e.g., ensemble machine learning) for the initial estimation of
+nuisance parameters.</li>
+<li>The <code>medoutcon</code> <code>R</code> package uses cross-validation in initial estimation: this
+results in cross-validated (or “cross-fitted”) one-step and TML estimators
+<span class="citation">(<a href="#ref-klaassen1987consistent">Klaassen, 1987</a>; <a href="#ref-zheng2011cross">Zheng and van der Laan, 2011</a>; <a href="#ref-chernozhukov2018double">Chernozhukov et al., 2018</a>)</span>, which
+exhibit greater robustness than their non-sample-splitting analogs.</li>
+<li>To this end, <code>medoutcon</code> integrates with the <code>sl3</code> <code>R</code> package <span class="citation">(<a href="#ref-coyle2022sl3">Coyle et al., 2022</a>)</span>,
+which is extensively documented in this <a href="https://tlverse.org/tlverse-handbook/sl3">book
+chapter</a> <span class="citation">(<a href="#ref-phillips2022super">Phillips, 2022</a>; <a href="#ref-vdl2022targeted">van der Laan et al., 2022</a>)</span>.</li>
 </ul>
 </div>
-<div id="if-you-dont-have-r-and-rstudio-installed" class="section level5 hasAnchor" number="0.5.1.1.2">
-<h5><span class="header-section-number">0.5.1.1.2</span> If you don’t have R and RStudio installed<a href="index.html#if-you-dont-have-r-and-rstudio-installed" class="anchor-section" aria-label="Anchor link to header"></a></h5>
+<div id="interlude-sl3-for-nuisance-parameter-estimation" class="section level3 hasAnchor" number="7.1.2">
+<h3><span class="header-section-number">7.1.2</span> Interlude: <code>sl3</code> for nuisance parameter estimation<a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#interlude-sl3-for-nuisance-parameter-estimation" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <ul>
-<li>Download R from
-the <a href="http://cran.r-project.org/bin/windows/base/release.htm">CRAN website</a>.</li>
-<li>Run the <code>.exe</code> file that was just downloaded</li>
-<li>Go to the <a href="https://www.rstudio.com/products/rstudio/download/#download">RStudio download
-page</a></li>
-<li>Under <em>Installers</em> select <strong>RStudio x.yy.zzz - Windows
-XP/Vista/7/8</strong> (where x, y, and z represent version numbers)</li>
-<li>Double click the file to install it</li>
-<li>Once it’s installed, open RStudio to make sure it works and you don’t get any
-error messages.</li>
+<li>To fully take advantage of the one-step and TML estimators, we’d like to rely
+on flexible, data adaptive strategies for nuisance parameter estimation.</li>
+<li>Doing so minimizes opportunities for model misspecification to compromise our
+analytic conclusions.</li>
+<li>Choosing among the diversity of available machine learning algorithms can be
+challenging, so we recommend using the Super Learner algorithm for ensemble
+machine learning <span class="citation">(<a href="#ref-vdl2007super">van der Laan et al., 2007</a>)</span>, which is implemented in the <a href="https://github.com/tlverse/sl3"><code>sl3</code> R
+package</a> <span class="citation">(<a href="#ref-coyle2022sl3">Coyle et al., 2022</a>)</span>.</li>
+<li>Below, we demonstrate the construction of an ensemble learner based on a
+limited library of algorithms, including n intercept model, a main terms GLM,
+Lasso (<span class="math inline">\(\ell_1\)</span>-penalized) regression, and random forest (<code>ranger</code>).</li>
+</ul>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb37-1" tabindex="-1"></a><span class="co"># instantiate learners</span></span>
+<span id="cb37-2"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb37-2" tabindex="-1"></a>mean_lrnr <span class="ot">&lt;-</span> Lrnr_mean<span class="sc">$</span><span class="fu">new</span>()</span>
+<span id="cb37-3"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb37-3" tabindex="-1"></a>fglm_lrnr <span class="ot">&lt;-</span> Lrnr_glm_fast<span class="sc">$</span><span class="fu">new</span>()</span>
+<span id="cb37-4"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb37-4" tabindex="-1"></a>lasso_lrnr <span class="ot">&lt;-</span> Lrnr_glmnet<span class="sc">$</span><span class="fu">new</span>(<span class="at">alpha =</span> <span class="dv">1</span>, <span class="at">nfolds =</span> <span class="dv">3</span>)</span>
+<span id="cb37-5"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb37-5" tabindex="-1"></a>rf_lrnr <span class="ot">&lt;-</span> Lrnr_ranger<span class="sc">$</span><span class="fu">new</span>(<span class="at">num.trees =</span> <span class="dv">200</span>)</span>
+<span id="cb37-6"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb37-6" tabindex="-1"></a></span>
+<span id="cb37-7"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb37-7" tabindex="-1"></a><span class="co"># create learner library and instantiate super learner ensemble</span></span>
+<span id="cb37-8"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb37-8" tabindex="-1"></a>lrnr_lib <span class="ot">&lt;-</span> Stack<span class="sc">$</span><span class="fu">new</span>(mean_lrnr, fglm_lrnr, lasso_lrnr, rf_lrnr)</span>
+<span id="cb37-9"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb37-9" tabindex="-1"></a>sl_lrnr <span class="ot">&lt;-</span> Lrnr_sl<span class="sc">$</span><span class="fu">new</span>(<span class="at">learners =</span> lrnr_lib, <span class="at">metalearner =</span> Lrnr_nnls<span class="sc">$</span><span class="fu">new</span>())</span></code></pre></div>
+<ul>
+<li>Of course, there are many alternatives for learning algorithms to be included
+in such a modeling library. Feel free to explore!</li>
 </ul>
 </div>
-</div>
-<div id="mac-osx" class="section level4 hasAnchor" number="0.5.1.2">
-<h4><span class="header-section-number">0.5.1.2</span> Mac OSX<a href="index.html#mac-osx" class="anchor-section" aria-label="Anchor link to header"></a></h4>
-<div id="if-you-already-have-r-and-rstudio-installed-1" class="section level5 hasAnchor" number="0.5.1.2.1">
-<h5><span class="header-section-number">0.5.1.2.1</span> If you already have R and RStudio installed<a href="index.html#if-you-already-have-r-and-rstudio-installed-1" class="anchor-section" aria-label="Anchor link to header"></a></h5>
+<div id="efficient-estimation-of-the-natural-indirect-effects" class="section level3 hasAnchor" number="7.1.3">
+<h3><span class="header-section-number">7.1.3</span> Efficient estimation of the natural (in)direct effects<a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#efficient-estimation-of-the-natural-indirect-effects" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <ul>
-<li>Open RStudio, and click on “Help” &gt; “Check for updates”. If a new version is
-available, quit RStudio, and download the latest version for RStudio.</li>
-<li>To check the version of R you are using, start RStudio and the first thing
-that appears on the terminal indicates the version of R you are running.
-Alternatively, you can type <code>sessionInfo()</code>, which will also display which
-version of R you are running. Go on the <a href="https://cran.r-project.org/bin/macosx/">CRAN
-website</a> and check whether a more
-recent version is available. If so, please download and install it.</li>
+<li>Estimation of the natural direct and indirect effects requires estimation of a
+few nuisance parameters. Recall that these are
+<ul>
+<li><span class="math inline">\(g(a\mid w)\)</span>, which denotes <span class="math inline">\(\P(A=a \mid W=w)\)</span></li>
+<li><span class="math inline">\(h(a\mid m, w)\)</span>, which denotes <span class="math inline">\(\P(A=a \mid M=m, W=w)\)</span></li>
+<li><span class="math inline">\(b(a, m, w)\)</span>, which denotes <span class="math inline">\(\E(Y \mid A=a, M=m, W=w)\)</span></li>
+</ul></li>
+<li>While we recommend the use of Super Learning, we opt to instead estimate all
+nuisance parameters with Lasso regression below (to save computational time).</li>
+<li>Now, let’s use the <code>medoutcon()</code> function to estimate the <em>natural direct
+effect</em>:</li>
+</ul>
+<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb38-1" tabindex="-1"></a><span class="co"># compute one-step estimate of the natural direct effect</span></span>
+<span id="cb38-2"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb38-2" tabindex="-1"></a>nde_onestep <span class="ot">&lt;-</span> <span class="fu">medoutcon</span>(</span>
+<span id="cb38-3"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb38-3" tabindex="-1"></a>  <span class="at">W =</span> weight_behavior[, <span class="fu">c</span>(<span class="st">&quot;age&quot;</span>, <span class="st">&quot;sex&quot;</span>, <span class="st">&quot;race&quot;</span>, <span class="st">&quot;tvhours&quot;</span>)],</span>
+<span id="cb38-4"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb38-4" tabindex="-1"></a>  <span class="at">A =</span> (<span class="fu">as.numeric</span>(weight_behavior<span class="sc">$</span>sports) <span class="sc">-</span> <span class="dv">1</span>),</span>
+<span id="cb38-5"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb38-5" tabindex="-1"></a>  <span class="at">Z =</span> <span class="cn">NULL</span>,</span>
+<span id="cb38-6"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb38-6" tabindex="-1"></a>  <span class="at">M =</span> weight_behavior[, <span class="fu">c</span>(<span class="st">&quot;snack&quot;</span>, <span class="st">&quot;exercises&quot;</span>, <span class="st">&quot;overweigh&quot;</span>)],</span>
+<span id="cb38-7"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb38-7" tabindex="-1"></a>  <span class="at">Y =</span> weight_behavior<span class="sc">$</span>bmi,</span>
+<span id="cb38-8"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb38-8" tabindex="-1"></a>  <span class="at">g_learners =</span> lasso_lrnr,</span>
+<span id="cb38-9"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb38-9" tabindex="-1"></a>  <span class="at">h_learners =</span> lasso_lrnr,</span>
+<span id="cb38-10"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb38-10" tabindex="-1"></a>  <span class="at">b_learners =</span> lasso_lrnr,</span>
+<span id="cb38-11"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb38-11" tabindex="-1"></a>  <span class="at">effect =</span> <span class="st">&quot;direct&quot;</span>,</span>
+<span id="cb38-12"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb38-12" tabindex="-1"></a>  <span class="at">estimator =</span> <span class="st">&quot;onestep&quot;</span>,</span>
+<span id="cb38-13"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb38-13" tabindex="-1"></a>  <span class="at">estimator_args =</span> <span class="fu">list</span>(<span class="at">cv_folds =</span> <span class="dv">5</span>)</span>
+<span id="cb38-14"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb38-14" tabindex="-1"></a>)</span>
+<span id="cb38-15"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb38-15" tabindex="-1"></a><span class="fu">summary</span>(nde_onestep)</span>
+<span id="cb38-16"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb38-16" tabindex="-1"></a><span class="co">#&gt; # A tibble: 1 × 7</span></span>
+<span id="cb38-17"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb38-17" tabindex="-1"></a><span class="co">#&gt;   lwr_ci param_est upr_ci var_est  eif_mean estimator param         </span></span>
+<span id="cb38-18"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb38-18" tabindex="-1"></a><span class="co">#&gt;    &lt;dbl&gt;     &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;     &lt;dbl&gt; &lt;chr&gt;     &lt;chr&gt;         </span></span>
+<span id="cb38-19"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb38-19" tabindex="-1"></a><span class="co">#&gt; 1 -0.600   -0.0880  0.424  0.0683 -5.25e-16 onestep   direct_natural</span></span></code></pre></div>
+<ul>
+<li>We can similarly call <code>medoutcon()</code> to estimate the <em>natural indirect effect</em>:</li>
+</ul>
+<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb39-1" tabindex="-1"></a><span class="co"># compute one-step estimate of the natural indirect effect</span></span>
+<span id="cb39-2"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb39-2" tabindex="-1"></a>nie_onestep <span class="ot">&lt;-</span> <span class="fu">medoutcon</span>(</span>
+<span id="cb39-3"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb39-3" tabindex="-1"></a>  <span class="at">W =</span> weight_behavior[, <span class="fu">c</span>(<span class="st">&quot;age&quot;</span>, <span class="st">&quot;sex&quot;</span>, <span class="st">&quot;race&quot;</span>, <span class="st">&quot;tvhours&quot;</span>)],</span>
+<span id="cb39-4"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb39-4" tabindex="-1"></a>  <span class="at">A =</span> (<span class="fu">as.numeric</span>(weight_behavior<span class="sc">$</span>sports) <span class="sc">-</span> <span class="dv">1</span>),</span>
+<span id="cb39-5"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb39-5" tabindex="-1"></a>  <span class="at">Z =</span> <span class="cn">NULL</span>,</span>
+<span id="cb39-6"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb39-6" tabindex="-1"></a>  <span class="at">M =</span> weight_behavior[, <span class="fu">c</span>(<span class="st">&quot;snack&quot;</span>, <span class="st">&quot;exercises&quot;</span>, <span class="st">&quot;overweigh&quot;</span>)],</span>
+<span id="cb39-7"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb39-7" tabindex="-1"></a>  <span class="at">Y =</span> weight_behavior<span class="sc">$</span>bmi,</span>
+<span id="cb39-8"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb39-8" tabindex="-1"></a>  <span class="at">g_learners =</span> lasso_lrnr,</span>
+<span id="cb39-9"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb39-9" tabindex="-1"></a>  <span class="at">h_learners =</span> lasso_lrnr,</span>
+<span id="cb39-10"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb39-10" tabindex="-1"></a>  <span class="at">b_learners =</span> lasso_lrnr,</span>
+<span id="cb39-11"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb39-11" tabindex="-1"></a>  <span class="at">effect =</span> <span class="st">&quot;indirect&quot;</span>,</span>
+<span id="cb39-12"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb39-12" tabindex="-1"></a>  <span class="at">estimator =</span> <span class="st">&quot;onestep&quot;</span>,</span>
+<span id="cb39-13"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb39-13" tabindex="-1"></a>  <span class="at">estimator_args =</span> <span class="fu">list</span>(<span class="at">cv_folds =</span> <span class="dv">5</span>)</span>
+<span id="cb39-14"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb39-14" tabindex="-1"></a>)</span>
+<span id="cb39-15"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb39-15" tabindex="-1"></a><span class="fu">summary</span>(nie_onestep)</span>
+<span id="cb39-16"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb39-16" tabindex="-1"></a><span class="co">#&gt; # A tibble: 1 × 7</span></span>
+<span id="cb39-17"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb39-17" tabindex="-1"></a><span class="co">#&gt;   lwr_ci param_est upr_ci var_est eif_mean estimator param           </span></span>
+<span id="cb39-18"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb39-18" tabindex="-1"></a><span class="co">#&gt;    &lt;dbl&gt;     &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;    &lt;dbl&gt; &lt;chr&gt;     &lt;chr&gt;           </span></span>
+<span id="cb39-19"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb39-19" tabindex="-1"></a><span class="co">#&gt; 1  0.477      1.04   1.61  0.0838 3.48e-16 onestep   indirect_natural</span></span></code></pre></div>
+<ul>
+<li>From the above, we can conclude that the effect of participation on a sports
+team on BMI is primarily mediated by the variables <code>snack</code>, <code>exercises</code>, and
+<code>overweigh</code>, as the natural indirect effect is several times larger than the
+natural direct effect.</li>
+<li>Note that we could have instead used the TML estimators, which have improved
+finite-sample performance, instead of the one-step estimators. Doing this is
+as simple as setting the <code>estimator = "tmle"</code> in the relevant argument.</li>
 </ul>
 </div>
-<div id="if-you-dont-have-r-and-rstudio-installed-1" class="section level5 hasAnchor" number="0.5.1.2.2">
-<h5><span class="header-section-number">0.5.1.2.2</span> If you don’t have R and RStudio installed<a href="index.html#if-you-dont-have-r-and-rstudio-installed-1" class="anchor-section" aria-label="Anchor link to header"></a></h5>
+<div id="interventional-indirect-effects-1" class="section level3 hasAnchor" number="7.1.4">
+<h3><span class="header-section-number">7.1.4</span> Interventional (in)direct effects<a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#interventional-indirect-effects-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Since our knowledge of the system under study is incomplete, we might worry that
+one (or more) of the measured variables are not mediators, but, in fact,
+intermediate confounders affected by treatment. While the natural (in)direct
+effects are not identified in this setting, their interventional (in)direct
+counterparts are, as we saw in an earlier section. Recall that both types of
+effects are defined by static interventions on the treatment. The interventional
+effects are distinguished by their use of a stochastic intervention on the
+mediator to aid in their identification.</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:unnamed-chunk-2"></span>
+<img src="06-estimation-code-walkthrough_files/figure-html/unnamed-chunk-2-1.png" alt="Directed acyclic graph under intermediate confounders of the mediator-outcome relation affected by treatment" width="80%" />
+<p class="caption">
+FIGURE 7.1: Directed acyclic graph under intermediate confounders of the mediator-outcome relation affected by treatment
+</p>
+</div>
+<p>Recall that the interventional (in)direct effects are defined via the decomposition:
+<span class="math display">\[\begin{equation*}
+\E[Y_{1,G_1} - Y_{0,G_0}] = \underbrace{\E[Y_{\color{red}{1},\color{blue}{G_1}} -
+    Y_{\color{red}{1},\color{blue}{G_0}}]}_{\text{interventional indirect effect}} +
+    \underbrace{\E[Y_{\color{blue}{1},\color{red}{G_0}} -
+    Y_{\color{blue}{0},\color{red}{G_0}}]}_{\text{interventional direct effect}}
+\end{equation*}\]</span></p>
 <ul>
-<li>Download R from the <a href="http://cran.r-project.org/bin/macosx">CRAN website</a>.</li>
-<li>Select the <code>.pkg</code> file for the latest R version</li>
-<li>Double click on the downloaded file to install R</li>
-<li>It is also a good idea to install <a href="https://www.xquartz.org/">XQuartz</a> (needed
-by some packages)</li>
-<li>Go to the <a href="https://www.rstudio.com/products/rstudio/download/#download">RStudio download
-page</a></li>
-<li>Under <em>Installers</em> select <strong>RStudio x.yy.zzz - Mac OS X 10.6+ (64-bit)</strong>
-(where x, y, and z represent version numbers)</li>
-<li>Double click the file to install RStudio</li>
-<li>Once it’s installed, open RStudio to make sure it works and you don’t get any
-error messages.</li>
+<li>In our data example, we’ll consider the eating of snacks as a potential
+intermediate confounder, since one might reasonably hypothesize that
+participation on a sports team might subsequently affect snacking, which then
+could affect mediators like the amount of exercises and overweight status.</li>
+<li>The interventional direct and indirect effects may also be easily estimated
+with the <a href="https://github.com/nhejazi/medoutcon"><code>medoutcon</code> <code>R</code> package</a>
+<span class="citation">(<a href="#ref-hejazi2022medoutcon-rpkg">Hejazi et al., 2022a</a>; <a href="#ref-hejazi2022medoutcon-joss">b</a>)</span>.</li>
+<li>Just as for the natural (in)direct effects, <code>medoutcon</code> implements
+cross-validated one-step and TML estimators of the interventional effects.</li>
 </ul>
 </div>
-</div>
-<div id="linux" class="section level4 hasAnchor" number="0.5.1.3">
-<h4><span class="header-section-number">0.5.1.3</span> Linux<a href="index.html#linux" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<div id="efficient-estimation-of-the-interventional-indirect-effects" class="section level3 hasAnchor" number="7.1.5">
+<h3><span class="header-section-number">7.1.5</span> Efficient estimation of the interventional (in)direct effects<a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#efficient-estimation-of-the-interventional-indirect-effects" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <ul>
-<li>Follow the instructions for your distribution from
-<a href="https://cloud.r-project.org/bin/linux">CRAN</a>, they provide information to get
-the most recent version of R for common distributions. For most distributions,
-you could use your package manager (e.g., for Debian/Ubuntu run <code>sudo apt-get   install r-base</code>, and for Fedora <code>sudo yum install R</code>), but we don’t recommend
-this approach as the versions provided by this are usually out of date. In any
-case, make sure you have at least R 3.3.1.</li>
-<li>Go to the <a href="https://www.rstudio.com/products/rstudio/download/#download">RStudio download
-page</a></li>
-<li>Under <em>Installers</em> select the version that matches your distribution, and
-install it with your preferred method (e.g., with Debian/Ubuntu <code>sudo dpkg -i   rstudio-x.yy.zzz-amd64.deb</code> at the terminal).</li>
-<li>Once it’s installed, open RStudio to make sure it works and you don’t get any
-error messages.</li>
-</ul>
-<p>These setup instructions are adapted from those written for <a href="http://www.datacarpentry.org/R-ecology-lesson/">Data Carpentry: R
-for Data Analysis and Visualization of Ecological
-Data</a>.</p>
-</div>
-</div>
-<div id="renv" class="section level3 hasAnchor" number="0.5.2">
-<h3><span class="header-section-number">0.5.2</span> Virtual Enironment setup with <code>renv</code><a href="index.html#renv" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>These instructions are intended to help with setting up the included <a href="https://rstudio.github.io/renv/index.html"><code>renv</code>
-virtual environment</a>, which ensures
-all participants are using the same exact set of <code>R</code> packages (and package
-versions). A few important notes to keep in mind:</p>
+<li>Estimation of these effects is more complex, so a few additional nuisance
+parameters arise when expressing the (more general) EIF for these effects:
 <ul>
-<li>When <code>R</code> is started from the top level of this repository, <code>renv</code> is
-activated automatically. There is no further action required on your part. If
-<code>renv</code> is not installed, it will be installed automatically, assuming that you
-have an active internet connection.</li>
-<li>While <code>renv</code> is active, the <code>R</code> session will only have access to the packages
-(and their dependencies) that are listed in the <code>renv.lock</code> file – that is,
-you should not expect to have access to any other <code>R</code> packages that may be
-installed elsewhere on the computing system in use.</li>
-<li>Upon an initial attempt, <code>renv</code> will prompt you to install packages listed in
-the <code>renv.lock</code> file, by printing a message like the following:</li>
+<li><span class="math inline">\(q(z \mid a, w)\)</span>, the conditional density of the intermediate confounders,
+conditional only on treatment and baseline covariates;</li>
+<li><span class="math inline">\(r(z \mid a, m, w)\)</span>, the conditional density of the intermediate
+confounders, conditional on mediators, treatment, and baseline covariates.</li>
+</ul></li>
+<li>To estimate the interventional effects, we only need to set the argument <code>Z</code>
+of <code>medoutcon</code> to a value other than <code>NULL</code>.</li>
+<li>Note that the implementation in <code>medoutcon</code> is currently limited to settings
+with only binary intermediate confounders, i.e., <span class="math inline">\(Z \in \{0, 1\}\)</span>.</li>
+<li>Let’s use <code>medoutcon()</code> to estimate the <em>interventional direct effect</em>:</li>
 </ul>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="index.html#cb1-1" tabindex="-1"></a><span class="co"># * Project &#39;PATH/TO/causal_mediation_workshops&#39; loaded. [renv 0.13.2]</span></span>
-<span id="cb1-2"><a href="index.html#cb1-2" tabindex="-1"></a><span class="co"># * The project may be out of sync -- use `renv::status()` for more details.</span></span>
-<span id="cb1-3"><a href="index.html#cb1-3" tabindex="-1"></a><span class="sc">&gt;</span> renv<span class="sc">::</span><span class="fu">status</span>()</span>
-<span id="cb1-4"><a href="index.html#cb1-4" tabindex="-1"></a><span class="co"># The following package(s) are recorded in the lockfile, but not installed:</span></span>
-<span id="cb1-5"><a href="index.html#cb1-5" tabindex="-1"></a><span class="co"># Use `renv::restore()` to install these packages.</span></span></code></pre></div>
-<p>In any such case, please call <code>renv::restore()</code> to install any missing packages.
-Note that you do <em>not</em> need to manually install the packages via
-<code>install.packages()</code>, <code>remotes::install_github()</code>, or similar.</p>
-<p>For details on how the <code>renv</code> system works, the following references may be
-helpful:</p>
-<ol style="list-style-type: decimal">
-<li><a href="https://rstudio.github.io/renv/articles/collaborating.html">Collaborating with
-<code>renv</code></a></li>
-<li><a href="https://rstudio.github.io/renv/articles/renv.html">Introduction to <code>renv</code></a></li>
-</ol>
-<p>In some rare cases, <code>R</code> packages that <code>renv</code> automatically tries to install as
-part of the <code>renv::restore()</code> process may fail due to missing systems-level
-dependencies. In such cases, a reference to the missing dependencies and
-system-specific instructions their installation involving, e.g., <a href="http://manpages.ubuntu.com/manpages/bionic/man8/apt.8.html">Ubuntu
-Linux’s <code>apt</code></a> or
-<a href="https://brew.sh/"><code>homebrew</code> for macOS</a>, will usually be displayed.</p>
+<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb40-1"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb40-1" tabindex="-1"></a><span class="co"># compute one-step estimate of the interventional direct effect</span></span>
+<span id="cb40-2"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb40-2" tabindex="-1"></a>interv_de_onestep <span class="ot">&lt;-</span> <span class="fu">medoutcon</span>(</span>
+<span id="cb40-3"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb40-3" tabindex="-1"></a>  <span class="at">W =</span> weight_behavior[, <span class="fu">c</span>(<span class="st">&quot;age&quot;</span>, <span class="st">&quot;sex&quot;</span>, <span class="st">&quot;race&quot;</span>, <span class="st">&quot;tvhours&quot;</span>)],</span>
+<span id="cb40-4"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb40-4" tabindex="-1"></a>  <span class="at">A =</span> (<span class="fu">as.numeric</span>(weight_behavior<span class="sc">$</span>sports) <span class="sc">-</span> <span class="dv">1</span>),</span>
+<span id="cb40-5"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb40-5" tabindex="-1"></a>  <span class="at">Z =</span> (<span class="fu">as.numeric</span>(weight_behavior<span class="sc">$</span>snack) <span class="sc">-</span> <span class="dv">1</span>),</span>
+<span id="cb40-6"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb40-6" tabindex="-1"></a>  <span class="at">M =</span> weight_behavior[, <span class="fu">c</span>(<span class="st">&quot;exercises&quot;</span>, <span class="st">&quot;overweigh&quot;</span>)],</span>
+<span id="cb40-7"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb40-7" tabindex="-1"></a>  <span class="at">Y =</span> weight_behavior<span class="sc">$</span>bmi,</span>
+<span id="cb40-8"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb40-8" tabindex="-1"></a>  <span class="at">g_learners =</span> lasso_lrnr,</span>
+<span id="cb40-9"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb40-9" tabindex="-1"></a>  <span class="at">h_learners =</span> lasso_lrnr,</span>
+<span id="cb40-10"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb40-10" tabindex="-1"></a>  <span class="at">b_learners =</span> lasso_lrnr,</span>
+<span id="cb40-11"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb40-11" tabindex="-1"></a>  <span class="at">effect =</span> <span class="st">&quot;direct&quot;</span>,</span>
+<span id="cb40-12"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb40-12" tabindex="-1"></a>  <span class="at">estimator =</span> <span class="st">&quot;onestep&quot;</span>,</span>
+<span id="cb40-13"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb40-13" tabindex="-1"></a>  <span class="at">estimator_args =</span> <span class="fu">list</span>(<span class="at">cv_folds =</span> <span class="dv">5</span>)</span>
+<span id="cb40-14"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb40-14" tabindex="-1"></a>)</span>
+<span id="cb40-15"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb40-15" tabindex="-1"></a><span class="fu">summary</span>(interv_de_onestep)</span>
+<span id="cb40-16"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb40-16" tabindex="-1"></a><span class="co">#&gt; # A tibble: 1 × 7</span></span>
+<span id="cb40-17"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb40-17" tabindex="-1"></a><span class="co">#&gt;   lwr_ci param_est upr_ci var_est eif_mean estimator param                </span></span>
+<span id="cb40-18"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb40-18" tabindex="-1"></a><span class="co">#&gt;    &lt;dbl&gt;     &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;    &lt;dbl&gt; &lt;chr&gt;     &lt;chr&gt;                </span></span>
+<span id="cb40-19"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb40-19" tabindex="-1"></a><span class="co">#&gt; 1 -0.309     0.239  0.788  0.0782 1.94e-15 onestep   direct_interventional</span></span></code></pre></div>
+<ul>
+<li>We can similarly estimate the <em>interventional indirect effect</em>:</li>
+</ul>
+<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb41-1"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb41-1" tabindex="-1"></a><span class="co"># compute one-step estimate of the interventional indirect effect</span></span>
+<span id="cb41-2"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb41-2" tabindex="-1"></a>interv_ie_onestep <span class="ot">&lt;-</span> <span class="fu">medoutcon</span>(</span>
+<span id="cb41-3"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb41-3" tabindex="-1"></a>  <span class="at">W =</span> weight_behavior[, <span class="fu">c</span>(<span class="st">&quot;age&quot;</span>, <span class="st">&quot;sex&quot;</span>, <span class="st">&quot;race&quot;</span>, <span class="st">&quot;tvhours&quot;</span>)],</span>
+<span id="cb41-4"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb41-4" tabindex="-1"></a>  <span class="at">A =</span> (<span class="fu">as.numeric</span>(weight_behavior<span class="sc">$</span>sports) <span class="sc">-</span> <span class="dv">1</span>),</span>
+<span id="cb41-5"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb41-5" tabindex="-1"></a>  <span class="at">Z =</span> (<span class="fu">as.numeric</span>(weight_behavior<span class="sc">$</span>snack) <span class="sc">-</span> <span class="dv">1</span>),</span>
+<span id="cb41-6"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb41-6" tabindex="-1"></a>  <span class="at">M =</span> weight_behavior[, <span class="fu">c</span>(<span class="st">&quot;exercises&quot;</span>, <span class="st">&quot;overweigh&quot;</span>)],</span>
+<span id="cb41-7"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb41-7" tabindex="-1"></a>  <span class="at">Y =</span> weight_behavior<span class="sc">$</span>bmi,</span>
+<span id="cb41-8"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb41-8" tabindex="-1"></a>  <span class="at">g_learners =</span> lasso_lrnr,</span>
+<span id="cb41-9"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb41-9" tabindex="-1"></a>  <span class="at">h_learners =</span> lasso_lrnr,</span>
+<span id="cb41-10"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb41-10" tabindex="-1"></a>  <span class="at">b_learners =</span> lasso_lrnr,</span>
+<span id="cb41-11"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb41-11" tabindex="-1"></a>  <span class="at">effect =</span> <span class="st">&quot;indirect&quot;</span>,</span>
+<span id="cb41-12"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb41-12" tabindex="-1"></a>  <span class="at">estimator =</span> <span class="st">&quot;onestep&quot;</span>,</span>
+<span id="cb41-13"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb41-13" tabindex="-1"></a>  <span class="at">estimator_args =</span> <span class="fu">list</span>(<span class="at">cv_folds =</span> <span class="dv">5</span>)</span>
+<span id="cb41-14"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb41-14" tabindex="-1"></a>)</span>
+<span id="cb41-15"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb41-15" tabindex="-1"></a><span class="fu">summary</span>(interv_ie_onestep)</span>
+<span id="cb41-16"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb41-16" tabindex="-1"></a><span class="co">#&gt; # A tibble: 1 × 7</span></span>
+<span id="cb41-17"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb41-17" tabindex="-1"></a><span class="co">#&gt;   lwr_ci param_est upr_ci var_est eif_mean estimator param                  </span></span>
+<span id="cb41-18"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb41-18" tabindex="-1"></a><span class="co">#&gt;    &lt;dbl&gt;     &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;    &lt;dbl&gt; &lt;chr&gt;     &lt;chr&gt;                  </span></span>
+<span id="cb41-19"><a href="r-packages-for-estimation-of-the-causal-indirect-effects.html#cb41-19" tabindex="-1"></a><span class="co">#&gt; 1  0.524      1.06   1.60  0.0758 1.69e-16 onestep   indirect_interventional</span></span></code></pre></div>
+<ul>
+<li>From the above, we can conclude that the effect of participation on a sports
+team on BMI is largely through the interventional indirect effect (i.e.,
+through the pathways involving the mediating variables) rather than via its
+direct effect.</li>
+<li>Just as before, we could have instead used the TML estimators, instead of the
+one-step estimators. Doing this is as simple as setting the
+<code>estimator = "tmle"</code> in the relevant argument.</li>
+</ul>
+<!--
+## `medshift`: Stochastic (in)direct effects
+
+While the analyses using the natural and interventional effects have been
+illuminating, we may also go beyond the restrictive static interventions
+required to define these (in)direct effects. In fact, it may be more realistic
+to consider interventions that do not directly force children to join athletic
+teams, but instead motivate them to make their participation on such teams more
+likely. Importantly, such interventions are often far more realistic and
+actionable in real-world studies.
+
+### Formulating the stochastic (in)direct effects
+
+* These more flexible intervention regimes are incompatible with (in)direct
+  effect definitions based on decomposing the average treatment effect.
+* Instead, consider the decomposition of the population intervention effect
+  (PIE) of a _stochastic intervention_ into direct and indirect effects
+  [@diaz2020causal]:
+\begin{align*}
+  \E[Y&_{A_\delta,M_{A_\delta}} - Y_{A,M_A}] = \\
+  &\underbrace{\E[Y_{\color{red}{A_\delta},\color{blue}{M_{A_\delta}}} -
+    Y_{\color{red}{A_\delta},
+    \color{blue}{M}}]}_{\text{stochastic natural indirect effect}} +
+    \underbrace{\E[Y_{\color{blue}{A_\delta},\color{red}{M}} -
+    Y_{\color{blue}{A},
+    \color{red}{M}}]}_{\text{stochastic natural direct effect}}
+\end{align*}
+* Recall from our discussion of the [incremental propensity score
+  interventions](#ipsi) [@kennedy2018nonparametric] that such stochastic
+  interventions can compare the pre- and post-intervention odds of exposure:
+\begin{equation*}
+  \delta = \frac{\text{odds}(A_\delta = 1\mid W=w)}
+  {\text{odds}(A = 1\mid W=w)}.
+\end{equation*}
+* In our analysis, we will modulate the _odds of participating in a sports
+  team_ by a fixed amount for each individual, setting, for example,
+  $\delta = 2$:
+
+```r
+delta_shift_ipsi <- 2
+```
+* Such an intervention may be interpreted as the effect of a school program
+  that motivates children to participate in sports teams.
+
+### Efficient estimation of the stochastic (in)direct effects
+
+* The decomposition of the PIE into the direct and indirect effects leads to a
+  common term $\E[Y_{\color{red}{A_\delta},\color{blue}{M}}]$ involved in both
+  the direct and indirect effect definitions. This term may be estimated via
+  the [`medshift` `R` package](https://github.com/nhejazi/medshift)
+  [@hejazi2020medshift].
+* For the direct effect, the remaining term is the
+  $\E[Y_{\color{blue}{A},\color{red}{M}}]$, which may be estimated by a simple
+  mean in the observed data (i.e., no intervention).
+* For the indirect effect, the remaining term is the joint effect of stochastic
+  interventions on both $A$ and $M$:
+  $\E[Y_{\color{red}{A_\delta},\color{blue}{M_{A_\delta}}}$.
+  * For the case of an IPSI on binary $A$, this may be estimated by the tools
+    in the [`npcausal` `R` package](https://github.com/ehkennedy/npcausal).
+  * For the case of an MTP on continuous $A$, this may be estimated by the
+    tools in the [`txshift` `R` package](https://github.com/nhejazi/txshift)
+    [@hejazi2020txshift-rpkg; @hejazi2020txshift-joss].
+* Like the implementation in `medoutcon`, the `medshift` package makes use of
+  cross-validation in constructing initial estimates of nuisance parameters,
+  resulting in more robust, cross-validated efficient estimators
+  [@klaassen1987consistent; @zheng2011cross; @chernozhukov2018double].
+* Now, we're ready to use the `medshift` function to estimate the decomposition
+  term common to both the _stochastic direct and indirect effects_:
+
+```r
+# compute one-step estimate of the decomposition term of the (in)direct effects
+stoch_decomp_onestep <- medshift(
+  W = weight_behavior[, c("age", "sex", "race", "tvhours")],
+  A = (as.numeric(weight_behavior$sports) - 1),
+  Z = weight_behavior[, c("snack", "exercises", "overweigh")],
+  Y = weight_behavior$bmi,
+  delta = delta_shift_ipsi,
+  g_learners = lasso_lrnr,
+  e_learners = lasso_lrnr,
+  m_learners = lasso_lrnr,
+  estimator = "onestep",
+  estimator_args = list(cv_folds = 5)
+)
+summary(stoch_decomp_onestep)
+#>      lwr_ci   param_est      upr_ci   param_var    eif_mean   estimator 
+#>   18.763158   19.099417   19.435676    0.029434 -3.5415e-16     onestep
+```
+
+* To estimate the stochastic direct effect, an extra step is necessary -- we
+  must apply the delta method:
+
+```r
+# convenience function to compute inference via delta method: EY1 - EY0
+linear_contrast <- function(params, eifs, ci_level = 0.95) {
+  # bounds for confidence interval
+  ci_norm_bounds <- c(-1, 1) * abs(stats::qnorm(p = (1 - ci_level) / 2))
+  param_est <- params[[1]] - params[[2]]
+  eif <- eifs[[1]] - eifs[[2]]
+  se_eif <- sqrt(var(eif) / length(eif))
+  param_ci <- param_est + ci_norm_bounds * se_eif
+  # parameter and inference
+  out <- c(param_ci[1], param_est, param_ci[2])
+  names(out) <- c("lwr_ci", "param_est", "upr_ci")
+  return(out)
+}
+```
+* Straightforward application of this procedure yields,
+
+```r
+# parameter estimates and EIFs for components of direct effect
+EY <- mean(weight_behavior$bmi)
+eif_EY <- weight_behavior$bmi - EY
+params_de <- list(stoch_decomp_onestep$theta, EY)
+eifs_de <- list(stoch_decomp_onestep$eif, eif_EY)
+
+# direct effect = EY - estimated quantity
+de_est <- linear_contrast(params_de, eifs_de)
+de_est
+#>    lwr_ci param_est    upr_ci 
+#> -0.494596 -0.027691  0.439215
+```
+* From the above, we can conclude that the effect of increasing the odds of
+  participation on a sports team on BMI leads only to a relatively small direct
+  effect.
+-->
 
 </div>
+</div>
+</div>
+<h3>References<a href="references.html#references" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-chernozhukov2018double" class="csl-entry">
+Chernozhukov, V., Chetverikov, D., Demirer, M., Duflo, E., Hansen, C., Newey, W., et al. (2018) <a href="https://doi.org/10.1111/ectj.12097">Double/debiased machine learning for treatment and structural parameters</a>. <em>The Econometrics Journal</em>, <strong>21</strong>.
+</div>
+<div id="ref-coyle2022sl3" class="csl-entry">
+Coyle, J.R., Hejazi, N.S., Malenica, I., Phillips, R.V. and Sofrygin, O. (2022) <em><a href="https://doi.org/10.5281/zenodo.1342293"><span class="nocase">sl3</span>: Modern Pipelines for Machine Learning and <span>Super Learning</span></a></em>. <a href="https://github.com/tlverse/sl3" class="uri">https://github.com/tlverse/sl3</a>.
+</div>
+<div id="ref-diaz2020nonparametric" class="csl-entry">
+Dı́az, I., Hejazi, N.S., Rudolph, K.E. and van der Laan, M.J. (2020) <a href="https://doi.org/10.1093/biomet/asaa085">Non-parametric efficient causal mediation with intermediate confounders</a>. <em>Biometrika</em>.
+</div>
+<div id="ref-hejazi2022medoutcon-rpkg" class="csl-entry">
+Hejazi, N.S., Dı́az, I. and Rudolph, K.E. (2022a) <a href="https://doi.org/10.5281/zenodo.5809519"><span class="nocase">medoutcon</span>: Efficient natural and interventional causal mediation analysis</a>.
+</div>
+<div id="ref-hejazi2022medoutcon-joss" class="csl-entry">
+Hejazi, N.S., Rudolph, K.E. and Dı́az, I. (2022b) <a href="https://doi.org/10.21105/joss.03979"><span class="nocase">medoutcon</span>: Nonparametric efficient causal mediation analysis with machine learning in <span>R</span></a>. <em>Journal of Open Source Software</em>.
+</div>
+<div id="ref-klaassen1987consistent" class="csl-entry">
+Klaassen, C.A. (1987) Consistent estimation of the influence function of locally asymptotically linear estimators. <em>The Annals of Statistics</em>, 1548–1562.
+</div>
+<div id="ref-phillips2022super" class="csl-entry">
+Phillips, R.V. (2022) <a href="https://tlverse.org/tlverse-handbook/sl3.html">Super (machine) learning</a>. <em><span class="nocase">Targeted Learning in <code>R</code>: Causal Data Science with the <code>tlverse</code> Software Ecosystem</span></em> p. Springer.
+</div>
+<div id="ref-vdl2022targeted" class="csl-entry">
+van der Laan, M.J., Coyle, J.R., Hejazi, N.S., Malenica, I., Phillips, R.V. and Hubbard, A.E. (2022) <em><a href=""><span class="nocase">Targeted Learning in <code>R</code>: Causal Data Science with the <code>tlverse</code> Software Ecosystem</span></a></em>. CRC Press.
+</div>
+<div id="ref-vdl2007super" class="csl-entry">
+van der Laan, M.J., Polley, E.C. and Hubbard, A.E. (2007) <span>Super Learner</span>. <em>Statistical Applications in Genetics and Molecular Biology</em>, <strong>6</strong>.
+</div>
+<div id="ref-zheng2011cross" class="csl-entry">
+Zheng, W. and van der Laan, M.J. (2011) Cross-validated targeted minimum-loss-based estimation. <em>Targeted learning</em> pp. 459–474. Springer.
 </div>
 </div>
             </section>
@@ -1541,8 +1606,8 @@ Linux’s <code>apt</code></a> or
           </div>
         </div>
       </div>
-
-<a href="mediation.html" class="navigation navigation-next navigation-unique" aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="construction-of-a-semiparametric-efficient-estimator-for-the-nde-a.k.a.-the-one-step-estimator.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="appendix-additional-topics-of-interest.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
@@ -1563,7 +1628,7 @@ gitbook.start({
 "size": 2
 },
 "edit": {
-"link": "https://github.com/nhejazi/causal_mediation_workshops/edit/master/index.Rmd",
+"link": "https://github.com/nhejazi/causal_mediation_workshops/edit/master/06-estimation-code-walkthrough.Rmd",
 "text": "Edit"
 },
 "history": {
